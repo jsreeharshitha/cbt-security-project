@@ -3,7 +3,7 @@ import re
 import requests
 from langchain_ollama import OllamaLLM 
 
-# Setting Ollama Environment based on Program running environment
+# === Setting Ollama Environment based on Program running environment ===
 APP_ENV = os.getenv("APP_ENV", "dev")
 if APP_ENV == "prod":
     OLLAMA_URL = "http://host.docker.internal:11434"
@@ -17,12 +17,11 @@ else:
 MODEL_NAME = "gemma2" 
 
 def run_simple_agent():
-    print(f"--- Connecting to Ollama at {OLLAMA_URL} ---")
-    
+    print(f"--- Connecting to Ollama at {OLLAMA_URL} ---")    
     try:
-        # Creating an LLM brain using Ollama/Gemma3 class.
-        llm = OllamaLLM(model=MODEL_NAME, base_url=OLLAMA_URL)
 
+        # === Creating an LLM brain using Ollama/Gemma2 class. ===
+        llm = OllamaLLM(model=MODEL_NAME, base_url=OLLAMA_URL)
         SYSTEM_PROMPT = """
             ROLE:
             You are a specialized 5G Network Assistant for the CAMARA Project.
@@ -50,36 +49,41 @@ def run_simple_agent():
             if user_input.lower() == 'exit':
                 break
             print(f"User: {user_input}")
-
-            # Invoke response
             full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {user_input}\nAssistant:"
             response = llm.invoke(full_prompt)
             print(f"\nGemma: {response}")
         
-            # CONNECTING TO SECURITY PROXY (GOVERNOR)
-            # Look for the API format in the LLM's response
-            match = re.search(r"\[API_CALL:\s*([A-Z_]+)\]", response)
-            
+            # === CONNECTING TO SECURITY PROXY (GOVERNOR) ===
+            match = re.search(r"\[API_CALL:\s*([A-Z_]+)\]", response)    
             if match:
                 api_action = match.group(1)
                 print(f"\nAgent attempting to call CAMARA API: {api_action}")
-                print("Forwarding request to Security Proxy for Validation...")
-                
+                print("Forwarding request to Security Proxy for Validation...")  
                 try:
-                    # 1. Fetch mock DPoP token (Simulating Auth Server)
-                    token_resp = requests.get(f"{PROXY_URL}/generate-test-token")
+
+                    # ==========================================
+                    # FOR TESTING: To change the ID for seeing Layer 3 in action!
+                    # Use "gemma3-agent-001" to PASS Layer 3.
+                    # Use "compromised-agent-999" to FAIL Layer 3.
+                    # ==========================================
+                    CURRENT_AGENT_ID = "gemma3-agent-001"
+
+                    # === To fetch mock DPoP token (Simulating Auth Server) ===
+                    token_resp = requests.get(f"{PROXY_URL}/generate-test-token/{CURRENT_AGENT_ID}")
+                    if token_resp.status_code != 200:
+                        print("Error fetching token from Auth Server.")
+                        continue
                     token = token_resp.json().get("token")
                     
-                    # 2. Send payload to Proxy
+                    # === To send payload to Proxy ===
                     headers = {"X-DPoP-Proof": token}
                     payload = {
                         "user_intent": user_input,
                         "api_action": api_action
                     }
                     
-                    # POST Request to Layer 1 & 2
-                    proxy_resp = requests.post(f"{PROXY_URL}/validate-action", json=payload, headers=headers)
-                    
+                    # === POST Request to evaluate all 3 Security Proxy Layers ===
+                    proxy_resp = requests.post(f"{PROXY_URL}/validate-action", json=payload, headers=headers) 
                     if proxy_resp.status_code == 200:
                         print(f"PROXY APPROVED: {proxy_resp.json().get('message')}")
                     else:
