@@ -83,8 +83,8 @@ def run_simple_agent():
                         "api_action": api_action
                     }
 
-                    # # RED TEAM TEST: Intentionally tampering with the token signature!
-                    # headers = {"X-DPoP-Proof": token + "tampered_fake_data"} 
+                    # # RED TEAM TEST: Intentionally Exploiting the token signature!
+                    # headers = {"X-DPoP-Proof": token + "exploited_fake_data"} 
                     # payload = {
                     #     "user_intent": user_input,
                     #     "api_action": api_action
