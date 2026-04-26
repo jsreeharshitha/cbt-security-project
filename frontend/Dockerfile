@@ -16,7 +16,7 @@ RUN apk add --no-cache \
 ENV OLLAMA_BASE_URL="http://host.docker.internal:11434"
 ENV APP_ENV="prod"
 
-COPY requirement.txt .
-RUN pip install --no-cache-dir -r requirement.txt
+COPY ../requirement.txt .
+RUN pip install --no-cache-dir -r ../requirement.txt
 COPY . .
-CMD ["python", "frontend/main.py"]
+CMD ["python", "main.py"]
