@@ -67,6 +67,7 @@ def run_simple_agent():
                     # Use "compromised-agent-999" to FAIL Layer 3.
                     # ==========================================
                     CURRENT_AGENT_ID = "gemma3-agent-001"
+                  # CURRENT_AGENT_ID = "compromised-agent-999"
 
                     # === To fetch mock DPoP token (Simulating Auth Server) ===
                     token_resp = requests.get(f"{PROXY_URL}/generate-test-token/{CURRENT_AGENT_ID}")
@@ -81,6 +82,13 @@ def run_simple_agent():
                         "user_intent": user_input,
                         "api_action": api_action
                     }
+
+                    # # RED TEAM TEST: Intentionally tampering with the token signature!
+                    # headers = {"X-DPoP-Proof": token + "tampered_fake_data"} 
+                    # payload = {
+                    #     "user_intent": user_input,
+                    #     "api_action": api_action
+                    # }
                     
                     # === POST Request to evaluate all 3 Security Proxy Layers ===
                     proxy_resp = requests.post(f"{PROXY_URL}/validate-action", json=payload, headers=headers) 
