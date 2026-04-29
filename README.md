@@ -9,7 +9,7 @@ This project introduces a **three-layer Zero Trust Architecture Security Proxy**
 
 ## Architecture & Core Features
 
-The security proxy implements a strict "assume breach" and defense-in-depth methodology, intercepting all requests before they reach the backend telecom APIs (e.g., SIM Swap, Device Location). 
+The security proxy implements a strict `assume breach` and defense-in-depth methodology, intercepting all requests before they reach the backend telecom APIs (e.g., SIM Swap, Device Location). 
 
 ### 1. Layer 1: Cryptographic Binding (DPoP)
 Prevents traditional token theft by verifying `X-DPoP-Proof` headers. The proxy ensures the API token is mathematically bound to the physical hardware (Public Key Thumbprint) of the requesting agent.
